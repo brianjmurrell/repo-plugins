@@ -315,7 +315,12 @@ class myAddon(t1mAddon):
     pg = re.compile('window.videoBridge = (.+?);\n', re.DOTALL).search(pg).group(1)
     a = json.loads(pg)
     if not a is None:
-        url = a['recommended_encoding']['url']
+        try:
+            url = a['recommended_encoding']['url']
+        except KeyError:
+            for url in a['encodings']:
+                if "#EXTM3U" in self.getRequest(url, limit=4096):
+                    break
         suburl = a['cc'].get('SRT')
         pg = self.getRequest('%s?format=json' % url)
         url = json.loads(pg)['url']
